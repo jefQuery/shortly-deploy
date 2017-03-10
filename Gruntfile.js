@@ -8,7 +8,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['app/*.js', 'public/client/*.js', 'server.js', 'server-config.js'],
-        dest: 'public/dist/built.js',
+        dest: 'public/dist/builtShortly.js',
       },
     },
 
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     },
 
     uglify: {
-      my_target: {
+      dist: {
         files: {
           'public/dist/output.min.js': ['public/dist/built.js']
         }
@@ -40,11 +40,16 @@ module.exports = function(grunt) {
         maxWarnings: 1
       },
       target: [
-        'app/*.js', 'public/client/*.js', 'server.js', 'server-config.js'
+        'app/**/*.js', 'public/**/*.js', './*.js', 'Gruntfile.js'
       ]
     },
 
     cssmin: {
+      dist: {
+        files: {
+          'public/dist/style.min.css': 'public/style.css'
+        }
+      }
     },
 
     watch: {
@@ -65,7 +70,13 @@ module.exports = function(grunt) {
     },  
 
     shell: {
-      prodServer: {
+      productionServer: {
+        command: 'git push live master',
+        options: {
+          stdout: true,
+          stderr: true,
+          failOnError: true
+        }
       }
     },
   });
@@ -93,26 +104,23 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'test', 'concat', 'uglify'
+    'test', 'concat', 'uglify', 'cssmin'
   ]);
 
   grunt.registerTask('upload', function(n) {
+    
     if (grunt.option('prod')) {
-
-
-      // add your production server task here
-
+      grunt.task.run(['shell:productionServer']);
 
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [ 'build', 'upload'
-    
-
+  grunt.registerTask('deploy', [ 
+    'build', 
+    'upload'
     // add your deploy tasks here
-  
   ]);
 
 
